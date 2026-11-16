@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Florida State Dashboard</title>
+  <link rel="icon" href="/static/emoji/shield.png" type="image/png">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Sign-in / first-run password setup -->
+  <div id="auth" class="auth-screen" hidden>
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="brand-mark">FS</div>
+        <div class="brand-text">
+          <strong>Florida State</strong>
+          <span>Dashboard</span>
+        </div>
+      </div>
+      <h1 id="auth-title">Administrator sign in</h1>
+      <p class="lead" id="auth-lead">Enter the dashboard password to manage the bot.</p>
+      <form id="auth-form">
+        <label class="field" id="auth-current-wrap" hidden>
+          <span>Current password</span>
+          <input type="password" id="auth-current" autocomplete="current-password">
+        </label>
+        <label class="field">
+          <span id="auth-password-label">Password</span>
+          <input type="password" id="auth-password" autocomplete="current-password" required>
+        </label>
+        <label class="field" id="auth-confirm-wrap" hidden>
+          <span>Confirm password</span>
+          <input type="password" id="auth-confirm" autocomplete="new-password">
+        </label>
+        <p id="auth-error" class="help" style="color: var(--bad); min-height: 18px; margin: 0 0 10px;"></p>
+        <button type="submit" class="btn primary" id="auth-submit" style="width: 100%; justify-content: center;">Sign in</button>
+        <a href="/auth/discord" id="auth-discord" class="btn" hidden style="width: 100%; justify-content: center; margin-top: 10px;">Sign in with Discord</a>
+      </form>
+      <p class="auth-note" id="auth-note"></p>
+    </div>
+  </div>
+
+  <!-- Dashboard shell -->
+  <div id="app" class="shell" hidden>
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">FS</div>
+        <div class="brand-text">
+          <strong>Florida State</strong>
+          <span>Dashboard</span>
+        </div>
+      </div>
+      <nav class="nav" id="nav">
+        <div class="nav-label">Always on</div>
+        <button data-view="sleep" title="Sleep mode"><img src="/media/emoji/refresh.png" alt="">Sleep mode</button>
+        <div class="nav-label">Manage</div>
+        <button data-view="overview" title="Overview"><img src="/media/emoji/home.png" alt="">Overview</button>
+        <button data-view="tickets" title="Tickets"><img src="/media/emoji/ticket.png" alt="">Tickets</button>
+        <button data-view="status" title="Bot status"><img src="/media/emoji/clock.png" alt="">Bot status</button>
+        <button data-view="config" title="Configuration"><img src="/media/emoji/settings.png" alt="">Configuration</button>
+        <button data-view="modules" title="Card modules"><img src="/media/emoji/document.png" alt="">Card modules</button>
+        <button data-view="ai" title="AI Control System"><img src="/media/emoji/staff.png" alt="">AI Control System</button>
+        <button data-view="security" title="Security"><img src="/media/emoji/shield.png" alt="">Security</button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="bot-chip" id="bot-chip">
+          <span class="pill neutral"><i></i></span>
+          <span><strong>Checking bot…</strong></span>
+        </div>
+        <button class="btn ghost" id="signout" style="justify-content: center;">Sign out</button>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div>
+          <h1 id="view-title">Overview</h1>
+          <p id="view-sub">Live status of your Discord server and ticket system</p>
+        </div>
+        <div class="top-actions">
+          <span class="chip" id="server-chip">No server connected</span>
+          <button class="btn icon" id="refresh-view" title="Refresh this page">
+            <img src="/media/emoji/refresh.png" alt="Refresh">
+          </button>
+        </div>
+      </header>
+      <main class="view" id="view"></main>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts"></div>
+  <div id="modal-root"></div>
+  <script src="/static/sleep.js"></script>
+  <script src="/static/modules.js"></script>
+  <script src="/static/ai.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

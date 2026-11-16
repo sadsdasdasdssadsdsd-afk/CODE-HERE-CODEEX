@@ -1,0 +1,49 @@
+# Production wiring for a 24/7 host (VPS, NAS, mini-PC, any always-on Docker machine).
+#
+#   cp .env.example .env && nano .env     # fill DISCORD_TOKEN
+#   docker compose -f deploy/docker-compose.prod.yml up -d --build
+#
+# Runs the same entry point as the sandbox: the admin dashboard on port 3000, which
+# supervises `python main.py`. SQLite databases and the log live in the
+# ticket-bot-data volume, and the container comes back after a crash or a reboot.
+name: ticket-bot-cv2
+
+services:
+  bot:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: ticket-bot-cv2:latest
+    command: ["python", "scripts/preview_dashboard.py"]
+    env_file:
+      - ../.env
+    environment:
+      PREVIEW_STATUS_PORT: "3000"
+      DASHBOARD_HOST: 0.0.0.0
+      DATABASE_PATH: /app/data/bot.db
+      TRIGGERS_DATABASE_PATH: /app/data/triggers.db
+      LOG_PATH: /app/data/bot.log
+    ports:
+      - "127.0.0.1:3001:3000"
+    volumes:
+      - ticket-bot-data:/app/data
+    restart: unless-stopped
+    stop_grace_period: 30s
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; r=urllib.request.urlopen('http://127.0.0.1:3000/health', timeout=4); assert r.status == 200"
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  ticket-bot-data:

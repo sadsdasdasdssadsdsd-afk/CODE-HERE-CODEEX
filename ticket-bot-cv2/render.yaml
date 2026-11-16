@@ -1,0 +1,47 @@
+# Render Blueprint: free hosting for the bot + its dashboard on one service.
+# Render Dashboard -> New -> Blueprint -> this repository -> branch main -> Apply.
+#
+# The free plan has no persistent disk and sleeps without traffic, so this service
+# runs the dashboard supervisor (it keeps `python main.py` alive and answers /health)
+# and needs a free uptime pinger to stay awake. For a paid worker with a disk at
+# /app/data, point the Blueprint at deploy/render-worker.yaml instead.
+# See deploy/README.md.
+services:
+  - type: web
+    name: ticket-bot-cv2
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python scripts/preview_dashboard.py
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      # Render injects PORT for web services; the dashboard reads it as a fallback.
+      - key: DATABASE_PATH
+        value: /app/data/bot.db
+      - key: TRIGGERS_DATABASE_PATH
+        value: /app/data/triggers.db
+      - key: LOG_PATH
+        value: /app/data/bot.log
+      - key: AUTO_SYNC_GUILD_EMOJIS
+        value: "true"
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: DISCORD_CLIENT_ID
+        sync: false
+      - key: DISCORD_CLIENT_SECRET
+        sync: false
+      - key: AI_API_KEY
+        sync: false
+      # Blank is fine: the bot starts and logs "Assistance panel not published yet"
+      # until the IDs are filled in under Environment.
+      - key: ASSISTANCE_GUILD_ID
+        sync: false
+      - key: ASSISTANCE_PANEL_CHANNEL_ID
+        sync: false
+      - key: ASSISTANCE_TICKET_CATEGORY_ID
+        sync: false
+      - key: ASSISTANCE_SUPPORT_ROLE_ID
+        sync: false
+      - key: ASSISTANCE_LOG_CHANNEL_ID
+        sync: false

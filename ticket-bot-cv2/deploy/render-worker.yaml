@@ -1,0 +1,42 @@
+# Render Blueprint: paid background worker with a persistent disk (state survives
+# deploys). New Blueprint -> this repository -> Blueprint File Path:
+# deploy/render-worker.yaml. See deploy/README.md, option 1B.
+# Keep exactly one instance: the bot stores its state in SQLite.
+services:
+  - type: worker
+    name: ticket-bot-cv2-worker
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_PATH
+        value: /app/data/bot.db
+      - key: TRIGGERS_DATABASE_PATH
+        value: /app/data/triggers.db
+      - key: LOG_PATH
+        value: /app/data/bot.log
+      - key: AUTO_SYNC_GUILD_EMOJIS
+        value: "true"
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: DISCORD_CLIENT_ID
+        sync: false
+      - key: DISCORD_CLIENT_SECRET
+        sync: false
+      - key: AI_API_KEY
+        sync: false
+      - key: ASSISTANCE_GUILD_ID
+        sync: false
+      - key: ASSISTANCE_PANEL_CHANNEL_ID
+        sync: false
+      - key: ASSISTANCE_TICKET_CATEGORY_ID
+        sync: false
+      - key: ASSISTANCE_SUPPORT_ROLE_ID
+        sync: false
+      - key: ASSISTANCE_LOG_CHANNEL_ID
+        sync: false
+    disk:
+      name: ticket-bot-data
+      mountPath: /app/data
+      sizeGB: 5
