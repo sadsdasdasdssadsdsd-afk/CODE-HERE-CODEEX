@@ -101,9 +101,10 @@ class BotRuntime:
                     process.terminate()
             self.exit_code = process.wait()
             print(f"[dashboard] bot process exited with code {self.exit_code}", flush=True)
+            # The bot is meant to stay online around the clock, so it is supervised
+            # until the dashboard itself stops: any other exit - clean or not - is
+            # followed by a restart, and a failed first login keeps retrying.
             if self._stop.is_set() or not self.token_configured:
-                return
-            if self.exit_code == 0 and self.ready:
                 return
             # Keep retrying with a capped backoff so the bot connects by itself once
             # the Discord application settings it needs are fixed. A throttled host

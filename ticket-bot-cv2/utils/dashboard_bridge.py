@@ -15,7 +15,7 @@ from types import SimpleNamespace
 from utils import assistance
 from utils import dashboard_store as store
 from utils.emojis import registry as emoji_registry
-from utils.presence import build_activity, describe, resolve_status
+from utils.presence import DEFAULT_STATUS, build_activity, describe, resolve_status
 
 logger = logging.getLogger("discord")
 
@@ -83,7 +83,7 @@ class DashboardBridge:
         if action == "presence":
             activity = payload.get("activity", "playing")
             text = payload.get("text", "")
-            status = payload.get("status", "online")
+            status = payload.get("status", DEFAULT_STATUS)
             if not await self.apply_presence(activity, text, status):
                 return False, "Bot is not connected to Discord"
             await self.note_activity(f"Presence updated to {describe(activity, text)}")
@@ -156,7 +156,7 @@ class DashboardBridge:
     async def apply_presence(self, activity: str, text: str, status: str) -> bool:
         if self.bot.user is None:
             return False
-        await self.bot.change_presence(activity=build_activity(activity, text), status=resolve_status(status))
+        await self.bot.set_presence(build_activity(activity, text), resolve_status(status))
         await store.write_bot_state(
             self.bot.db,
             {
@@ -184,7 +184,7 @@ class DashboardBridge:
                 await self.apply_presence(
                     entry["activity"],
                     entry["text"],
-                    settings.get("presence_status", "online"),
+                    settings.get("presence_status", DEFAULT_STATUS),
                 )
                 await self._sleep_or_wake(max(30, int(entry["duration_seconds"])))
             except asyncio.CancelledError:
@@ -244,7 +244,7 @@ class DashboardBridge:
             "role_count": len(guild.roles) if guild else None,
             "started_at": started_at.isoformat(timespec="seconds") if started_at else None,
             "last_activity": self._last_activity,
-            "presence_status": str(getattr(bot, "status", "online")),
+            "presence_status": getattr(bot, "presence_status", None) or DEFAULT_STATUS,
             "emoji_synced": emoji_registry.summary(guild)["synced"],
         }
         if activity_text:

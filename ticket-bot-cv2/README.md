@@ -236,7 +236,7 @@ Copy `.env.example` to `.env`. The application loads the project-root `.env` aut
 |---|---|---|
 | `BOT_PREFIX` | `!` | Prefix for hybrid/prefix commands. |
 | `BOT_STATUS` | `!help \| /help` | Activity text shown in Discord. |
-| `BOT_STATUS_TYPE` | `WATCHING` | `PLAYING`, `WATCHING`, `LISTENING`, `STREAMING`, `IDLE`, `DND`, or `INVISIBLE`. |
+| `BOT_STATUS_TYPE` | `INVISIBLE` | `PLAYING`, `WATCHING`, `LISTENING`, `STREAMING`, `IDLE`, `DND`, or `INVISIBLE`. `INVISIBLE` shows the bot as offline in Discord while it stays connected and keeps answering commands, tickets and questions; the presence is re-applied after a reconnect. |
 | `STREAM_URL` | empty | Public stream URL used only with `BOT_STATUS_TYPE=STREAMING`. |
 | `SUPPORT_SERVER_URL` | empty | Optional Discord invite shown in help and mention responses. |
 | `DEFAULT_PANEL_FOOTER` | `Developed by Nystic Shadow` | Default footer value stored with new ticket configuration. |

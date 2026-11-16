@@ -19,7 +19,10 @@ STATUS_LABELS = {
     "invisible": "Invisible",
 }
 
-DEFAULT_STATUS = "online"
+# Presence only controls how Discord *displays* the bot. "invisible" makes the
+# bot show as offline in the member list while the gateway session stays
+# connected, so it keeps answering commands, tickets and AI questions.
+DEFAULT_STATUS = "invisible"
 
 
 def build_activity(activity: str, text: str) -> discord.Activity:
@@ -49,6 +52,17 @@ def resolve_status(status: str | None) -> discord.Status:
         "dnd": discord.Status.dnd,
         "invisible": discord.Status.invisible,
     }.get(key, discord.Status.online)
+
+
+def status_key(status: object) -> str:
+    """Map a live ``discord.Status`` (or stored label) to the dashboard's key.
+
+    Some discord.py releases report the invisible presence as ``offline``; the
+    dashboard calls it ``invisible`` because the bot is connected either way.
+    """
+
+    value = str(getattr(status, "value", status) or DEFAULT_STATUS).lower()
+    return "invisible" if value == "offline" else value
 
 
 def describe(activity: str, text: str) -> str:

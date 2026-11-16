@@ -9,6 +9,7 @@ from utils import dashboard_store
 from utils.command_sync import CommandSyncCache
 from utils.config import config
 from utils.dashboard_bridge import DashboardBridge
+from utils.presence import status_key
 
 # Force UTF-8 encoding for Windows consoles
 if sys.platform == "win32":
@@ -76,6 +77,17 @@ class TicketBot(commands.Bot):
         self._ready_initialized = False
         self.guild_emoji_report = None
         self.dashboard = None
+        # The presence Discord should show, kept here because discord.py re-sends
+        # the presence it logged in with whenever a session has to be re-identified.
+        self.desired_presence = None
+        self.presence_status = None
+
+    async def set_presence(self, activity, status):
+        """Apply a presence and remember it so a reconnect keeps showing it."""
+
+        self.desired_presence = (activity, status)
+        self.presence_status = status_key(status)
+        await self.change_presence(activity=activity, status=status)
 
     async def setup_database(self):
         from utils.ai import schema as ai_schema
@@ -163,6 +175,13 @@ class TicketBot(commands.Bot):
     async def on_ready(self):
         if self._ready_initialized:
             logger.info("Discord connection resumed as %s", self.user)
+            if self.desired_presence is not None:
+                # A re-identified session starts from the login presence, which would
+                # reveal, say, an invisible bot as online. Put the live one back.
+                await self.change_presence(
+                    activity=self.desired_presence[0], status=self.desired_presence[1]
+                )
+                logger.info("Presence restored after reconnect: %s", self.presence_status)
             return
 
         try:
@@ -253,7 +272,7 @@ class TicketBot(commands.Bot):
                 elif config.BOT_STATUS_TYPE == "INVISIBLE":
                     status = discord.Status.invisible
 
-                await self.change_presence(activity=activity, status=status)
+                await self.set_presence(activity, status)
                 print_success(f"Bot status set: {config.BOT_STATUS} ({status_type})")
             except Exception as status_error:
                 print_error(f"Failed to set bot status: {status_error}")

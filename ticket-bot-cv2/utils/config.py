@@ -56,7 +56,8 @@ class Config:
             TOKEN=os.getenv("DISCORD_TOKEN", "").strip(),
             PREFIX=os.getenv("BOT_PREFIX", "!"),
             BOT_STATUS=os.getenv("BOT_STATUS", "!help | /help"),
-            BOT_STATUS_TYPE=os.getenv("BOT_STATUS_TYPE", "WATCHING").strip().upper(),
+            # INVISIBLE keeps the bot shown as offline while it stays connected.
+            BOT_STATUS_TYPE=os.getenv("BOT_STATUS_TYPE", "INVISIBLE").strip().upper(),
             DATABASE_PATH=os.getenv("DATABASE_PATH", "bot.db"),
             TRIGGERS_DATABASE_PATH=os.getenv("TRIGGERS_DATABASE_PATH", "triggers.db"),
             LOG_PATH=os.getenv("LOG_PATH", "bot.log"),

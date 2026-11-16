@@ -37,6 +37,7 @@ from dashboard.images import (
 from dashboard.runtime import BotRuntime
 from utils import assistance
 from utils import dashboard_store as store
+from utils.presence import DEFAULT_STATUS as DEFAULT_PRESENCE_STATUS
 from utils.ai import schema as ai_schema
 from utils.modules import schema as modules_schema
 
@@ -646,13 +647,13 @@ async def handle_status(request: web.Request) -> web.Response:
                 "activity": state.get("activity") or "",
                 "activity_type": state.get("activity_type") or "playing",
                 "activity_text": state.get("activity_text") or "",
-                "status": state.get("presence_status") or "online",
+                "status": state.get("presence_status") or DEFAULT_PRESENCE_STATUS,
                 "updated_at": state.get("presence_updated_at"),
                 "last_activity": state.get("last_activity"),
             },
             "rotation": {
                 "enabled": settings.get("rotation_enabled") == "1",
-                "presence_status": settings.get("presence_status") or "online",
+                "presence_status": settings.get("presence_status") or DEFAULT_PRESENCE_STATUS,
                 "entries": await store.list_statuses(db),
             },
             "activity_types": list(ACTIVITY_TYPES),
@@ -666,7 +667,7 @@ async def handle_apply_presence(request: web.Request) -> web.Response:
     payload = await request.json()
     activity = str(payload.get("activity") or "playing").lower()
     text = str(payload.get("text") or "").strip()
-    status = str(payload.get("status") or "online").lower()
+    status = str(payload.get("status") or DEFAULT_PRESENCE_STATUS).lower()
     if activity not in ACTIVITY_TYPES:
         return web.json_response({"error": "Unsupported activity type."}, status=400)
     if not text:
